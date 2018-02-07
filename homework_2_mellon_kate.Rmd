@@ -1,0 +1,38 @@
+---
+title: "homework_2_mellon_kate"
+author: "Kate Mellon"
+date: "2/6/2018"
+output: html_document
+self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(mdsr)
+
+ggplot(data=mpg) +
+  geom_point(aes(x=hwy,y=cty))
+
+ggplot(data=mpg) +
+  geom_point(aes(x=class,y=drv))
+
+```
+3.24 Exercises
+1.) I see a grey box.
+2.) There are 11 columns, and 234 rows.
+3.) The drv variable describes the wheel drive of the vehicle given the options front-wheel drive, rear wheel drive, or 4 wheel drive. 
+4.) 
+5.) A plot of class vs drv shows the type of car and has points on the type(s) of drv which are observed for each type of car. It isn't useful because it doesn't quantify the relationship between type of car and wheel drive in that one cannot see from this plot how common each drive is with the type of car, but only whether the type of drive exists for a certain type of car in the data set. 
+
+3.31 Exercises
+
+
+
+
