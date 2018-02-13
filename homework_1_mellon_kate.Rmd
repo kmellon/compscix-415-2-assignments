@@ -1,0 +1,70 @@
+---
+title: "COMPSCIX 415.2 Homework 1"
+author: "Kate Mellon"
+date: "2/5/2018"
+output: html_document
+---
+
+My Github repository for my assignments can be found at this URL: https://github.com/kmellon/compscix-415-2-assignments
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(mdsr)
+library(tidyverse)
+
+data("WorldCities")
+```
+
+## R Markdown
+```{r}
+glimpse(WorldCities)
+
+WorldCities <- head(WorldCities, 200) 
+country_col <- WorldCities$country
+unique(country_col)
+```
+
+Q1: There are 23,018 observations and 10 variables (i.e. latitude, country) in the WorldCities data set. 
+
+Q2:
+```{r}
+region_col <- WorldCities$region
+unique(region_col)
+```
+
+```{r}
+country_col <- select(WorldCities, country)
+country_col <- WorldCities %>% select(country)
+WorldCities %>% select(region) %>% head(5)
+
+
+
+```
+Q3:
+```{r}
+country_col %>% unique()
+```
+
+```{r}
+WorldCities %>% ggplot(aes(x = population)) +
+geom_histogram() +
+xlab('City Population')
+
+```
+
+Q4:
+```{r}
+WorldCities %>% ggplot(aes(x = population)) +
+geom_histogram() +
+xlab('City Population Size') +
+  ylab('Count of Population Size') +
+ggtitle('World Cities Population') +
+theme_bw()
+```
+
+
+

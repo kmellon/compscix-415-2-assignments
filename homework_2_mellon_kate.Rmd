@@ -23,16 +23,65 @@ ggplot(data=mpg) +
 ggplot(data=mpg) +
   geom_point(aes(x=class,y=drv))
 
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = class, size=hwy))
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = displ<5))
+
 ```
 3.24 Exercises
 1.) I see a grey box.
 2.) There are 11 columns, and 234 rows.
 3.) The drv variable describes the wheel drive of the vehicle given the options front-wheel drive, rear wheel drive, or 4 wheel drive. 
-4.) 
+4.) See chart above.
 5.) A plot of class vs drv shows the type of car and has points on the type(s) of drv which are observed for each type of car. It isn't useful because it doesn't quantify the relationship between type of car and wheel drive in that one cannot see from this plot how common each drive is with the type of car, but only whether the type of drive exists for a certain type of car in the data set. 
 
 3.31 Exercises
 
+1.) The points are not blue because a manual color specification needs to be given outside of the aes mapping as an argument of the geom function.
+2.) Continuous variables include displ, year, cycl, cty, and hwy.
+Categorical variables include manufacturer, model, trans, drv,fl, and class.
+3.) Color and size can be mapped continuously, while shape cannot be mapped to a continuous variable.
+4.) Mapping the same variable to multiple aesthetics will show variation in the spectrum of values along multiple dimensions (i.e. color and size). 
+5.) The stroke dimension affects the thickness of the border for certain shapes.
+6.) When you map an aesthetic to something other than a variable name, then the aesthetic is mapped based on the evaluation of the argument given. In the example, the argument displ<5 is a boolean statement, so the variable color is mapped based on whether the statement evaluates to true or false.
 
+3.51 Exercises
 
+4.) The advantage of using faceting instead of the color aesthetic is that it can be easier to visualize the relationships among many variables when they are charted separately. In this case, each value of the categorical variable 'class' has its own plot against hwy and displ, allowing one to focus on each type of car. In the previous plot using color to distinguish the class, I was more focused visually on the overall relationship between hwy and displ rather than relationship at the class level. The disadvantage in faceting is visualizing trends at the macro level, and it may not be as useful for continuous variables. For a large data set, the balance may lean toward faceting given that as more points are plotted in different colors they may overlap each other and be harder to distinguish.
+5.) Nrow specifies the number of rows to present the plots in. Ncol specifies the number of columns to present the plots in. Facet_grid doesn't have the ncol and nrow arguments because it maps to the combination of 2 variables which will be a specific number of rows and columns based on the variables chosen.
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv~cyl)
+```
+
+3.61 Exercises
+1.) The geoms used would be the following: line chart - geom_line(), boxplot - geom_boxplot(), histogram - geom_histogram(), and area chart - geom_area(). 
+2.) 
+```{r}
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE)
+```
+
+3.) show.legend = False removes the legend which describes how a variable is mapped to a certain aesthetic (i.e. color, size). It may have been used to show the difference between using the group aesthetic and assigning an aesthetic to a discrete variable 
+4.) The se argument allows you to specify whether to include the shading around the smooth line which represents a confidence interval. 
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) + 
+  geom_smooth(data = filter(mpg, class == "subcompact"), se=FALSE)
+```
+
+5.) The two graphs will look the same as they use the same data and mapping specifications, but store these in different functions.
+
+3.71 Exercises
+
+2.) geom_col uses stat_identity as its default stat, while geom_bar uses stat_count as its default stat. geom_col shows the height of bars as raw values of the data, while using geom_bar utilizes the count of rows to determine the bar height.
+
+1.) The graphics in the data scientist description often weren't the best way of describing the relationship between data science and BI, or regular data science versus big data science. For example, in the graphic 'data scientists are more likely to be involved across the data lifecycle' I thought it would have been more helpful to show each of those stages as segments in a bar chart with 1 bar for data science and 1 for BI. The visual for level of education was also a bit confusing as it didn't specify that the chart was showing highest educational level achieved. 
 
