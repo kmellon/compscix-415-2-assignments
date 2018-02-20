@@ -1,0 +1,166 @@
+---
+title: "homework_3_mellon_kate"
+author: "Kate Mellon"
+date: "2/13/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(mdsr)
+```
+
+## R Markdown
+
+3.81 Exercises
+
+1.) The problem with this plot is that while it appears to have overlapping data points. You could improve this plot by utilizing the geom_jitter adjustment. 
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point()
+```
+
+2.) The parameters to geom_jitter which control the amount of jittering are the width and height arguments used in position_jitter which affect the amount of vertical and horizontal jitter.
+
+3.) Geom_jitter and geom_count are both related to the overplotting or overlapping of data. Geom_jitter's approach to overplotting is to add random noise to the points on a plot, while geom_count takes the count of instances at locations on a plot and plots the count. 
+
+4.) For geom_boxplot, the default position adjustment is position = "dodge".
+
+```{r}
+ggplot(data=mpg) +
+  geom_boxplot(mapping = aes(x=class, y=hwy))
+```
+
+3.91 Exercises
+
+2.) labs() allows you to add axis, legend, and plot labels to properly describe the data portrayed in a plot. For example, one can add labels on the x-axis, y-axis, and a chart title. 
+
+4.) This plot of cty vs. hwy mpg illustrates a linear relationship between these two variables. geom_abline() adds a line showing what a 1:1 relationship between cty and hwy mpg would look like. coord_fixed() adjusts the aspect ration of data on the x and y axis such that 1 unit on the x-axis represents the same length as 1 unit on the y-axis.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  geom_abline() +
+  coord_fixed()
+```
+
+4.4 Exercises
+
+1.) The statement does not work because there is a typo when calling the variable 'my_variable' where the i is replaced by a 1. 
+
+2.) 
+
+```{r}
+library(tidyverse)
+
+ggplot(data =mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) 
+
+filter(mpg, cyl == 8) 
+filter(diamonds, carat > 3)
+```
+
+5.24 Exercises
+
+1.) 
+  1.) 
+
+```{r}
+library(nycflights13)
+  (filter(flights, arr_delay>=120))
+```
+
+  2.) 
+```{r}
+  filter(flights, dest == "IAH" | dest == "HOU")
+```
+  
+  3.)
+```{r}
+filter(flights, carrier == "UA" | carrier == "DL" | carrier == "AA")
+```
+  
+  4.) 
+```{r}
+filter(flights, month %in% c(7,8,9))
+```
+  
+  5.) 
+```{r}
+filter(flights, arr_delay>120, dep_delay<=0)
+```
+  
+  6.) 
+```{r}
+filter(flights, dep_delay>=60, dep_delay - arr_delay >=30)
+```
+  
+  7.)
+```{r}
+filter(flights, dep_time<=600)
+```
+  
+2.) between() allows you to filter values between two points. In the previous example 1.) 4.), between could have been used as following:
+
+```{r}
+filter(flights, between(month,7,9))
+```
+
+3.)
+```{r}
+filter(flights, is.na(dep_time))
+```
+
+Other variables that are missing include dep_delay, arr_time, arr_delay, and air_time suggesting that these rows represent flights which were cancelled. 
+
+4.) NA^0 is equal to 1. NA | True is not missing because the or operator (|) only includes the 'True' in this case, which evaluates to True. False & NA is not missing because the and operator (&) only includes the False in this case. The general rule implied by these is that operating on NA results in NA, while the comparison operators will exclude the NA from their evaulating an expression. 
+
+
+5.41
+
+1.) 
+```{r}
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+```
+
+
+```{r}
+select(flights, starts_with("dep"), starts_with("arr"))
+```
+
+
+```{r}
+select(flights, ends_with("delay"))
+```
+
+
+```{r}
+select(flights, contains("delay"))
+```
+
+2.) 
+
+```{r}
+select(flights, dep_delay, dep_delay)
+```
+
+When you select a variable name twice, it will only be shown once. 
+
+3.) 
+
+```{r}
+
+select(flights, one_of(vars <- c("year", "month", "day", "dep_delay", "arr_delay")))
+```
+
+The one_of() function selects the data based on a vector of variable names which match the names of variables in the table.
+
+4.) 
+```{r}
+select(flights, contains("TIME"))
+```
+
+The result of the code is a bit surprising since everything up until now has suggested case sensitivity when running code. The select helpers by default have the argument ignore.case = TRUE, and to change that default you would need to include ignore.case = FALSE in the function. 
+
