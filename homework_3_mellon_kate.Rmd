@@ -1,5 +1,5 @@
 ---
-title: "homework_3_mellon_kate"
+title: "COMPSCIX 415.2 Homework 3"
 author: "Kate Mellon"
 date: "2/13/2018"
 output: html_document
