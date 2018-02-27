@@ -1,0 +1,204 @@
+---
+title: "COMPSCIX 415.2 Homework 4"
+author: "Kate Mellon"
+date: "2/20/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+5.67 Exercises
+
+2.) 
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(nycflights13)
+
+not_cancelled <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>% count(dest)
+
+```
+
+```{r}
+not_cancelled %>% 
+  group_by(dest) %>%
+  summarize(n=n())
+```
+
+```{r}
+not_cancelled %>% count(tailnum, wt = distance)
+
+```
+
+```{r}
+not_cancelled %>% 
+  group_by(tailnum) %>%
+  summarize(n=sum(distance, na.rm = TRUE))
+```
+
+
+4.) The proportion of cancelled flights appears to be related to the average delay in that a higher proportion of cancelled flights relates to a longer average delay.
+
+```{r}
+
+ex <- flights %>%
+  group_by(day) %>%
+  summarize(prop_cancelled = sum(is.na(dep_delay)) / n(),
+            avg_delay = mean(dep_delay, na.rm = TRUE))
+
+ggplot(data = ex, mapping = aes(x=prop_cancelled, y=avg_delay)) +
+  geom_point() +
+  geom_smooth(se=FALSE)
+
+
+```
+
+
+5.) The F9 carrier has the worst average delay.
+
+```{r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(ave_delay = mean(dep_delay, na.rm=TRUE)) %>%
+  arrange(desc(ave_delay))
+  
+```
+
+Challenge:
+I tried to disentangle the effects of bad airports versus bad carriers by first taking the average flight delay and then taking the median of the deviation of the delay to see if the carriers were consistently delayed. 
+
+```{r}
+flights %>%
+  group_by(carrier, dest) %>%
+  summarize(ave_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  group_by(carrier) %>%
+  summarize(mad_delay = mad(ave_delay, na.rm = TRUE)) %>%
+  arrange(desc(mad_delay))
+```
+
+
+6.) The sort argument in the count function orders the data descending when sort = TRUE. This is useful when you want to arrange the data after counting it while saving a line of code from adding the arrange() function. 
+
+```{r}
+flights %>%
+  group_by(carrier) %>%
+  count(sort =TRUE)
+```
+
+
+10.5 Exercises
+
+1.) You can tell if an object is a tibble when printed becuase it will only print the first 10 rows, and the columns which fit the screen. 
+
+```{r}
+mtcars
+```
+
+2.) The default data frame behaviors may be frustrating as in the example partial completion may cause using the wrong variable (i.e. dfx returned the same value as df$xyz). Another difference between the data frame and tibble behavior is when using the [] in a data frame, the object returned will depend on the number of arguments given. Here, a data frame is returned as 2 arguments are given ("abc","xyz"). 
+
+```{r}
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```
+
+```{r}
+df <- tibble(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```
+
+
+3.) You can extract the reference variable from using mpg [[]]. The example below uses the 'displ' variable from the mpg data set.
+```{r}
+var <- "displ"
+mpg[[var]]
+```
+
+
+6.) The 'tibble.max_extra_cols' option controls how many additional column names are printed at the footer of a tibble.
+
+
+12.3.3 Exercises
+
+2.) The code fails because the column names 1999 and 2000 require a backtick (` `) since they are non-syntactic names as they don't start with a letter.
+
+3.) Spreading this tibble fails because the same name is observed more than once. Adding a column which uniquely identifies each person would fix the problem. 
+
+```{r}
+people <- tribble(
+  ~name,             ~key,    ~value,
+  #-----------------|--------|------
+  "Phillip Woods",   "age",       45,
+  "Phillip Woods",   "height",   186,
+  "Phillip Woods",   "age",       50,
+  "Jessica Cordero", "age",       37,
+  "Jessica Cordero", "height",   156
+)
+
+
+```
+
+4.) The tibble below needs to be gathered on the gender variable. 
+
+```{r}
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
+)
+
+preg %>%
+  gather(male, female, key = gender, value = freq)
+  
+```
+
+
+12.4.3 Exercises
+
+1.) The extra and fill arguments specify options for when there are too many and too few items respectively when using the separate() function. Extra can be set to "warn" to display a warning before dropping extra values, "drop" which drops the extra value(s) without a warning, and "merge" which is shown below to combine the extra values into one value. 
+
+```{r}
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
+  separate(x, c("one", "two", "three"), extra = "merge")
+```
+
+
+Fill can be set to "warn" to display a warning of missing values and defaults to displaying 'NA', "right" which fills missing values on the right, and "left" which is shown below to fill missing values on the left column. 
+
+```{r}
+tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
+  separate(x, c("one", "two", "three"), fill = "left")
+```
+
+2.) The remove argument in the unite() and separate() functions removes the input column from the output shown. You may want to set it to false as in the example below, it will show you the full input ('d,e,f,g') and allow you to see whether data was dropped ('g').
+
+```{r}
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
+  separate(x, c("one", "two", "three"), remove = FALSE)
+```
+
+Baby-names
+
+```{r}
+
+text_data <- read.table("/users/katie/downloads/baby_names.txt")
+glimpse(text_data)
+
+saveRDS(text_data, "baby_names.rds")
+new_file <- readRDS("baby_names.rds")
+glimpse(new_file)
+
+```
+
+
