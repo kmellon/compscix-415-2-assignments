@@ -9,22 +9,113 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+My Github repository for the midterm can be found at this URL: https://github.com/kmellon/compscix-415-2-assignments.git
+
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+####The tidyverse packages
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+1.) The tidyverse packages associated with the tasks below are as follows:
 
-```{r cars}
-summary(cars)
+Plotting - ggplot
+
+Data munging/wrangling - dplyr
+
+Reshaping (speading and gathering) data - tydr
+
+Importing/exporting data - readr
+
+
+2.) Two functions used from each package I listed above for the tasks below are as follows:
+
+Plotting - ggplot(), geom_point()
+
+Data munging/wrangling - filter(), select()
+
+Reshaping data - spread(), gather()
+
+Importing/exporting data - read_csv, write_csv
+
+####R Basics
+
+1.) 
+```{r}
+My_data.name___is.too00ooLong <- c( 1 , 2 , 3 )
+
 ```
 
-## Including Plots
+2.) 
 
-You can also embed plots, for example:
+```{r}
+my_string <- c('has', 'an', 'error', 'in', 'it')
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+3.) The values in the vector ...
+```{r}
+my_vector <- c(1, 2, '3', '4', 5)
+my_vector
+```
+
+
+####Data Import/Export
+
+1.)
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(tidyverse)
+rail_data <- read.table("/users/katie/downloads/rail_trail.txt")
+  glimpse(rail_data)
+```
+
+2.)
+```{r}
+saveRDS(rail_data,"rail_trail.rds")
+new_file <- readRDS("rail_trail.rds")
+glimpse(new_file)
+```
+
+
+####Visualization
+
+1.) 
+- The coloring in the graphic is confusing because a separate color is used to distinguish gender, while age is represented as all one color.
+- 
+-
+
+2.)
+
+```{r}
+
+ggplot(data=diamonds) +
+  geom_boxplot(mapping=aes(x=carat, y=cut, color=color)) +
+  xlab("CARAT OF DIAMOND") +
+  ylab("CUT OF DIAMOND")
+
+```
+
+
+####Data munging and wrangling
+
+1.) 
+
+```{r}
+spread(table2, key=type,value=count)
+
+```
+
+2.) 
+
+```{r}
+diamonds %>% 
+  mutate(price_per_carat = price/carat)
+
+```
+
+3.)
+```{r}
+
+```
+
+
+####EDA
