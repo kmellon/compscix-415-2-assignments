@@ -2,7 +2,11 @@
 title: "COMPSCIX 415.2 Homework 5/Midterm"
 author: "Kate Mellon"
 date: "3/1/2018"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_depth: 5
+
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 My Github repository for the midterm can be found at this URL: https://github.com/kmellon/compscix-415-2-assignments.git
 
-## R Markdown
+## Midterm Exercises
 
 ####The tidyverse packages
 
@@ -21,7 +25,7 @@ Plotting - ggplot
 
 Data munging/wrangling - dplyr
 
-Reshaping (speading and gathering) data - tydr
+Reshaping (speading and gathering) data - tidyr
 
 Importing/exporting data - readr
 
@@ -34,7 +38,7 @@ Data munging/wrangling - filter(), select()
 
 Reshaping data - spread(), gather()
 
-Importing/exporting data - read_csv, write_csv
+Importing/exporting data - read_csv(), write_csv()
 
 ####R Basics
 
@@ -51,7 +55,8 @@ my_string <- c('has', 'an', 'error', 'in', 'it')
 
 ```
 
-3.) The values in the vector ...
+3.) Vectors must have items of the same type. Here, numeric and character values are given, and the numeric values are converted to characters so all values in the vector are returned as characters. 
+
 ```{r}
 my_vector <- c(1, 2, '3', '4', 5)
 my_vector
@@ -79,19 +84,35 @@ glimpse(new_file)
 ####Visualization
 
 1.) 
+
 - The coloring in the graphic is confusing because a separate color is used to distinguish gender, while age is represented as all one color.
-- 
--
+
+- The mapping of values (% of respondents) to size makes sense as a scale, but is confusing when combining both the dimensions of age and gender in the same graphic (i.e. the spheres converge at a minimum and maximum value in the center of the chart for the 'yes' and 'no' values respectively). 
+
+- The title of the graphic 'Mrs. President' with 'Mrs' in bold text is leading in that it frames the graphic in a manner which isn't neutral because one isn't used to the phrase 'Mrs President'.
 
 2.)
 
 ```{r}
 
-ggplot(data=diamonds) +
-  geom_boxplot(mapping=aes(x=carat, y=cut, color=color)) +
-  xlab("CARAT OF DIAMOND") +
-  ylab("CUT OF DIAMOND")
+ggplot(data = diamonds, mapping = aes(x = cut, y = carat, fill = color)) +
+  geom_boxplot() +
+  coord_flip() +
 
+  ylab("CARAT OF DIAMOND") +
+  xlab("CUT OF DIAMOND")
+
+```
+
+3.)
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = reorder(cut,carat,fun=median), y = carat, fill=color)) +
+  geom_boxplot() +
+  coord_flip() +
+
+  ylab("CARAT OF DIAMOND") +
+  xlab("CUT OF DIAMOND")
 ```
 
 
@@ -112,10 +133,83 @@ diamonds %>%
 
 ```
 
-3.)
+3.) The results make sense in that the higher quality cuts of diamond have more which cost a higher price. An increasing proportion of the total diamonds by cut meet this criteria as the type of cut increases in quality. One should be mindful of the proportional figures, as the total diamonds by cut varies significanly from 1610 'Fair' to 21551 'Ideal' so the sample size by cut isn't ideal. 
+
 ```{r}
+diamonds %>% 
+  group_by(cut) %>% 
+  summarize(total = sum(price>10000 & carat<1.5),
+            proportion = total/n())
+```
+
+####EDA
+
+1.) The time period the data is from is 2000 - 2015. 
+
+```{r}
+ggplot(data = txhousing, mapping = aes(x= year, y = volume)) +
+  geom_point()
 
 ```
 
+2.) There are 46 cities represented in the data set. 
 
-####EDA
+```{r}
+txhousing %>% summarize(cities = n_distinct(city))
+```
+
+3.) Houston had the highest sales among cities.
+
+```{r}
+txhousing %>% group_by(city) %>% 
+  summarize(total_sales = sum(sales, na.rm = TRUE)) %>% 
+  arrange(desc(total_sales))
+```
+
+The month with the highest sales was June.
+```{r}
+txhousing %>% group_by(month) %>% 
+  summarize(total_sales = sum(sales, na.rm = TRUE)) %>% 
+  arrange(desc(total_sales))
+
+```
+
+The year with the highest sales was 2006.
+```{r}
+txhousing %>% group_by(year) %>% 
+  summarize(total_sales = sum(sales, na.rm = TRUE)) %>% 
+  arrange(desc(total_sales))
+```
+
+4.) There is a linear relationship between the number of listings and number of sales, with sales increasing as the volume of listings grows. As the plot shows, the aggregate number of listings is higher than the aggregate sales volume. 
+
+```{r}
+filtered <- filter(txhousing, !is.na(sales), !is.na(listings))
+
+ggplot(data=filtered, mapping = aes(x=listings, y=sales)) +
+  geom_point() +
+  geom_jitter() 
+
+```
+
+5.) 
+
+```{r}
+txhousing %>% 
+  group_by(city) %>% 
+  summarize(prop_missing = sum(is.na(sales)/n())) %>% 
+  arrange(desc(prop_missing))
+```
+
+6.) The distributions of the medial sales price vary significantly in that cities with similar median home prices have large variances in the standard deviation and median absolute deviation from the median. Cities that stand out with a high median absolute deviation from the median are Fort Bend and Austin. Filtering out cites/months with sales <500 cleans the data from the effects of time periods which don't have enough data to draw reliable conclusions from, cities which are outliers in the dataset perhaps due to smaller populations, and external influences unrelated in nature to the real estate market (i.e. storms, earthquakes, and other natural disasters). 
+
+```{r}
+txhousing %>% 
+  group_by(city) %>% 
+  filter(sales>500) %>% 
+  summarize(med = median(median), sd = sd(median), test2 = mad(median)) %>% 
+  arrange(desc(test2))
+```
+
+
+
