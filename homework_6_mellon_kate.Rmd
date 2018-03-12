@@ -1,0 +1,162 @@
+---
+title: "COMPSCIX 415.2 Homework 6"
+author: "Kate Mellon"
+date: "3/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Exercise 1
+
+1.) The variables in the data set are outcome, smoker, and age.
+
+```{r load_packages, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+library(mosaicData)
+data(Whickham)
+glimpse(Whickham)
+
+```
+
+2.) There are 1,314 observations and each one represents an individual who had participated in a survey from 20 years prior and the follow up 20 years later on whether they are alive or dead, their age at the time of the original survey, and their smoking status at the time of the original survey. 
+
+3.) The table below of smoking status vs. outcome is 
+
+```{r}
+library(mosaicData)
+library(tidyverse)
+Whickham %>% count(outcome, smoker)
+
+
+```
+
+```{r}
+
+test <- Whickham %>% count(outcome, smoker)
+
+ggplot(test, mapping=aes(x=smoker,y=n,fill=outcome)) +
+  geom_col()
+```
+
+4.) 
+
+```{r}
+
+new <- Whickham %>% 
+  select(age, smoker, outcome) %>% 
+  mutate(
+    age_fct = 
+      factor(case_when(age<= 44 ~ '<44', age>44 & age<=64 ~ '44<age<=64',
+                      age>64 ~ '>64'),
+             levels = c('<44','44<age<=64','>64')))
+
+new %>% 
+  ggplot(mapping=aes(x=smoker,y=count(smoker,outcome),fill=outcome)) +
+  geom_col() +
+  facet_wrap(~age_fct)
+
+```
+
+
+
+####Exercise 2
+
+1.)
+
+```{r}
+library(tidyverse)
+n <- 10000
+# look at ?rgamma to read about this function
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+
+ggplot(gamma_samp, mapping = aes(x)) +
+  geom_histogram()
+```
+
+2.)
+```{r}
+(mean_samp <- gamma_samp %>% .[['x']] %>% mean())
+
+(sd_samp <- gamma_samp %>% .[['x']] %>% sd())
+
+```
+
+3.) 
+```{r}
+
+n <- 30
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+
+ggplot(gamma_samp, mapping = aes(x)) +
+  geom_histogram()
+
+(mean_samp <- gamma_samp %>% .[['x']] %>% mean())
+
+(sd_samp <- gamma_samp %>% .[['x']] %>% sd())
+
+```
+
+4.) 
+```{r}
+mean_samp <- rep(NA, 10000)
+# start a loop
+for(i in 1:10000) {
+g_samp <- rgamma(30, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+# Convert vector to a tibble
+mean_samp <- tibble(mean_samp)
+
+mean_samp
+```
+
+5.)
+
+```{r}
+
+mean_samp <- rep(NA, 10000)
+# start a loop
+for(i in 1:10000) {
+g_samp <- rgamma(30, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+# Convert vector to a tibble
+mean_samp <- tibble(mean_samp)
+
+ggplot(mean_samp, mapping = aes(mean_samp)) +
+  geom_histogram()
+
+  
+```
+
+6.)
+
+```{r}
+mean_samp <- rep(NA, 10000)
+# start a loop
+for(i in 1:10000) {
+g_samp <- rgamma(30, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+# Convert vector to a tibble
+mean_samp <- tibble(mean_samp)
+
+(mean_sm <- mean_samp %>% summarize(mean=mean(mean_samp)))
+
+(sd_sm <- mean_samp %>% summarize(sd=sd(mean_samp)))
+
+```
+
+
+7.) Was anything surprising about your answers to #6?
+
+8.) Repeating 4-6 with n=300, do the results match up well with the theorem?
+
+```{r}
+
+```
+
