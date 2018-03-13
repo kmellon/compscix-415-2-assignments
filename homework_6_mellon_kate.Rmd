@@ -22,30 +22,25 @@ glimpse(Whickham)
 
 ```
 
-2.) There are 1,314 observations and each one represents an individual who had participated in a survey from 20 years prior and the follow up 20 years later on whether they are alive or dead, their age at the time of the original survey, and their smoking status at the time of the original survey. 
+2.) There are 1,314 observations and each one represents an individual who had participated in a survey from 20 years prior and the follow up outcome 20 years later on whether they are alive or dead, their age at the time of the original survey, and their smoking status at the time of the original survey. 
 
-3.) The table below of smoking status vs. outcome is 
+3.) At a glance the visualization of smoking status vs. outcome shows that more people who reported not smoking were dead 20 years later than those who reported smoking, however the overrall number of observations for non-smokers was greater.
 
 ```{r}
 library(mosaicData)
 library(tidyverse)
-Whickham %>% count(outcome, smoker)
 
-
-```
-
-```{r}
-
-test <- Whickham %>% count(outcome, smoker)
+(test <- Whickham %>% count(outcome, smoker))
 
 ggplot(test, mapping=aes(x=smoker,y=n,fill=outcome)) +
-  geom_col()
+  geom_col() +
+  xlab("Smoking Status") +
+  ylab("Observations by Outcome")
 ```
 
-4.) 
+4.) Faceting on the age factor shows that in the >64 population, a higher proportion of smokers were dead compared to non-smokers. In the 44<age<=64 range, there were more observations of smokers than non-smokers and a higher outcome of 'dead' observations.
 
 ```{r}
-
 new <- Whickham %>% 
   select(age, smoker, outcome) %>% 
   mutate(
@@ -55,12 +50,10 @@ new <- Whickham %>%
              levels = c('<44','44<age<=64','>64')))
 
 new %>% 
-  ggplot(mapping=aes(x=smoker,y=count(smoker,outcome),fill=outcome)) +
-  geom_col() +
+  ggplot(mapping=aes(x=smoker,fill=outcome)) +
+  geom_bar() +
   facet_wrap(~age_fct)
-
 ```
-
 
 
 ####Exercise 2
@@ -70,14 +63,15 @@ new %>%
 ```{r}
 library(tidyverse)
 n <- 10000
-# look at ?rgamma to read about this function
+
 gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
 
 ggplot(gamma_samp, mapping = aes(x)) +
-  geom_histogram()
+  geom_histogram(binwidth=0.5)
 ```
 
-2.)
+2.) The mean of the sample is ~1.988 and the standard deviation is ~2.004.
+
 ```{r}
 (mean_samp <- gamma_samp %>% .[['x']] %>% mean())
 
@@ -86,13 +80,13 @@ ggplot(gamma_samp, mapping = aes(x)) +
 ```
 
 3.) 
+
 ```{r}
 
-n <- 30
-gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+gamma_samp <- tibble(x = rgamma(30, shape = 1, scale = 2))
 
 ggplot(gamma_samp, mapping = aes(x)) +
-  geom_histogram()
+  geom_histogram(binwidth = 0.5)
 
 (mean_samp <- gamma_samp %>% .[['x']] %>% mean())
 
@@ -101,17 +95,17 @@ ggplot(gamma_samp, mapping = aes(x)) +
 ```
 
 4.) 
+
 ```{r}
 mean_samp <- rep(NA, 10000)
-# start a loop
+
 for(i in 1:10000) {
 g_samp <- rgamma(30, shape = 1, scale = 2)
 mean_samp[i] <- mean(g_samp)
 }
-# Convert vector to a tibble
-mean_samp <- tibble(mean_samp)
 
-mean_samp
+(mean_samp <- tibble(mean_samp))
+
 ```
 
 5.)
@@ -119,44 +113,53 @@ mean_samp
 ```{r}
 
 mean_samp <- rep(NA, 10000)
-# start a loop
+
 for(i in 1:10000) {
 g_samp <- rgamma(30, shape = 1, scale = 2)
 mean_samp[i] <- mean(g_samp)
 }
-# Convert vector to a tibble
-mean_samp <- tibble(mean_samp)
+
+(mean_samp <- tibble(mean_samp))
 
 ggplot(mean_samp, mapping = aes(mean_samp)) +
-  geom_histogram()
+  geom_histogram(binwidth = 0.2)
 
-  
 ```
 
 6.)
 
 ```{r}
 mean_samp <- rep(NA, 10000)
-# start a loop
+
 for(i in 1:10000) {
 g_samp <- rgamma(30, shape = 1, scale = 2)
 mean_samp[i] <- mean(g_samp)
 }
-# Convert vector to a tibble
+
 mean_samp <- tibble(mean_samp)
 
-(mean_sm <- mean_samp %>% summarize(mean=mean(mean_samp)))
-
-(sd_sm <- mean_samp %>% summarize(sd=sd(mean_samp)))
+(mean_sd <- mean_samp %>% summarize(mean=mean(mean_samp), sd=sd(mean_samp)))
 
 ```
 
+7.) The surprising part of exercise 6 is the standard deviation of ~.36 in comparison to the previously calculated standard deviation which was close to 2 when taking the sample mean wasn't repeated 10k times. 
 
-7.) Was anything surprising about your answers to #6?
-
-8.) Repeating 4-6 with n=300, do the results match up well with the theorem?
+8.) The results align well with the central limit theorem as increasing the sample size reduces the standard deviation from the sample means. 
 
 ```{r}
+mean_samp <- rep(NA, 10000)
+
+for(i in 1:10000) {
+g_samp <- rgamma(300, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+
+(mean_samp <- tibble(mean_samp))
+
+ggplot(mean_samp, mapping = aes(mean_samp)) +
+  geom_histogram(binwidth = 0.05)
+
+(mean_sd <- mean_samp %>% summarize(mean=mean(mean_samp), sd=sd(mean_samp)))
 
 ```
 
