@@ -1,0 +1,108 @@
+---
+title: "COMPSCIX 415.2 Homework 7"
+author: "Kate Mellon"
+date: "3/13/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+####  Exercise 1
+
+In the train.csv data set there are 1,460 observations and 81 columns.
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(tidyverse)
+train <- read.csv("/users/katie/downloads/train.csv")
+  glimpse(train)
+
+```
+
+#### Exercise 2
+
+```{r}
+
+library(tidyverse)
+library(broom)
+
+# When taking a random sample, it is often useful to set a seed so that
+# your work is reproducible. Setting a seed will guarantee that the same
+# random sample will be generated every time, so long as you always set the
+# same seed beforehand
+
+train <- read.csv("/users/katie/downloads/train.csv")
+
+set.seed(29283)
+
+# This data already has an Id column which we can make use of.
+# Let's create our training set using sample_frac. Fill in the blank.
+
+train_set <- train %>% sample_frac(0.7)
+
+# let's create our testing set using the Id column. Fill in the blanks.
+
+test_set <- train %>% filter(!(train$Id %in% train_set$Id))
+```
+
+#### Exercise 3
+
+```{r}
+# Fit a model with intercept only
+mod_0 <- lm(SalePrice ~ 1, data = train_set)
+# Double-check that the average SalePrice is equal to our model's coefficient
+mean(train_set$SalePrice)
+tidy(mod_0)
+# Check the R-squared
+glance(mod_0)
+
+```
+
+#### Exercise 4
+
+How would you interpret the coefficients on GrLivArea and OverallQual?
+
+How would you interpret the coefficient on NeighborhoodBrkSide?
+
+Are the features significant?
+
+Are the features practically significant?
+
+Is the model a good fit (to the training set)?
+
+```{r}
+mod_1 <- lm(SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_set)
+
+tidy(mod_1)
+  
+```
+
+#### Exercise 5
+
+```{r}
+test_predictions <- predict(mod_1, newdata = test_set)
+
+(rmse <- sqrt(mean((test_set$SalePrice - test_predictions)^2)))
+
+```
+
+#### Exercise 6
+
+#### Exercise 7
+
+```{r}
+sim1a <- tibble(
+x = rep(1:10, each = 3),
+y = x * 1.5 + 6 + rt(length(x), df = 2)
+)
+
+sim1a_rm <- lm(y~x, data = sim1a)
+
+sim1a_rm %>% ggplot(mapping=aes(x,y)) +
+  geom_point()
+
+```
+
+
+
