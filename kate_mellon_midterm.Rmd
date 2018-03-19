@@ -96,7 +96,7 @@ glimpse(new_file)
 ```{r}
 
 ggplot(data = diamonds, mapping = aes(x = cut, y = carat, fill = color)) +
-  geom_boxplot() +
+  geom_boxplot(position = 'identity') +
   coord_flip() +
 
   ylab("CARAT OF DIAMOND") +
