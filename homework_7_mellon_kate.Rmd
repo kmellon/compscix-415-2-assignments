@@ -48,6 +48,7 @@ test_set <- train %>% filter(!(train$Id %in% train_set$Id))
 
 #### Exercise 3
 
+The coefficient is the same value as the average value of SalePrice.
 ```{r}
 # Fit a model with intercept only
 mod_0 <- lm(SalePrice ~ 1, data = train_set)
@@ -61,22 +62,32 @@ glance(mod_0)
 
 #### Exercise 4
 
-How would you interpret the coefficients on GrLivArea and OverallQual?
-
-How would you interpret the coefficient on NeighborhoodBrkSide?
-
-Are the features significant?
-
-Are the features practically significant?
-
-Is the model a good fit (to the training set)?
-
 ```{r}
 mod_1 <- lm(SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_set)
 
 tidy(mod_1)
-  
 ```
+
+
+How would you interpret the coefficients on GrLivArea and OverallQual? 
+
+For every 1 unit increase in OverallQual, there is an estimated 21692.23178 increase in SalePrice. For every additional square foot of above ground living room space (GrLivArea), there is an estimated 62.77735 increase in SalePrice.
+
+How would you interpret the coefficient on NeighborhoodBrkSide?
+
+The coefficient implies that the value of SalePrice will be an estimated 14064.37052 lower than otherwise predicted if the neigbhorhood of the home is Brookside.
+
+Are the features significant?
+
+GrLivArea and OverallQual have p-values which suggest they are significant features. Neighborhood as a feature is not always significant; the neighborhoods which the model suggests are significant are Northridge, Northridge Heights, Stone Brook, and SWISU. 
+
+Are the features practically significant?
+
+Neighborhood may be practically significant as conceptually it would seem to have significance in predicting home prices. 
+
+Is the model a good fit (to the training set)?
+
+With GrLivArea and OverallQual significant, the model would appear to be a good fit, though the lack of significance shown in the p-value of several of the neighborhoods may suggest that the model is not with the best fitting combination of variables.
 
 #### Exercise 5
 
@@ -90,6 +101,8 @@ test_predictions <- predict(mod_1, newdata = test_set)
 #### Exercise 6
 
 #### Exercise 7
+
+In rerunning the model, the linear trend continues though the outliers will vary in position.
 
 ```{r}
 sim1a <- tibble(
