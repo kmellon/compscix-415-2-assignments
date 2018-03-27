@@ -1,0 +1,147 @@
+---
+title: "COMPSCIX 415.2 Homework 8"
+author: "Kate Mellon"
+date: "3/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Exercise 1
+
+There are 891 observations and 12 columns in the dataset.
+
+```{r load_packages, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+train <- read.csv("/users/katie/downloads/trainhw8.csv")
+glimpse(train)
+
+train$Survived <- factor(case_when(train$Survived == 0 ~ 'no', train$Survived == 1 ~ 'yes'))
+
+```
+
+#### Exercise 2
+
+```{r}
+library(tidyverse)
+library(broom)
+
+set.seed(29283)
+
+train_set <- train %>% sample_frac(0.7)
+
+test_set <- train %>% filter(!(train$PassengerId %in% train_set$PassengerId))
+
+```
+
+
+#### Exercise 3
+
+```{r}
+library(broom)
+# Fit a model with intercept only
+
+mod_1 <- glm(Survived ~ Pclass + Sex + Fare, data = train_set, family = 'binomial')
+# take a look at the features and coefficients
+tidy(mod_1)
+
+```
+
+The coefficients suggest that a higher Pclass is associated with a decreased probability of survival, being male is associated with a greater decrease in probability of survival, and an increase in Fare is associated with a slight increase in probability of survival. Pclass and Sex have p-values which suggest they are significant, while the p-value for Fare does not suggest it is significant.
+
+#### Exercise 4
+
+```{r}
+library(rpart)
+library(partykit)
+tree_mod <- rpart(Survived ~ Pclass + Sex + Fare, data = train_set)
+plot(as.party(tree_mod))
+
+```
+
+
+Describe in words one path a Titanic passenger might take down the tree. 
+
+A female passenger who was in 3rd class and paid a fare greater than 23.7 has a low probability of survival.
+
+Does anything surprise you about the fitted tree?
+
+Yes, it is surprising that there isn't another node after sex-male related to Pclass or Fare. It is also surprising that Fare seems to have been significant in probability of survival but only for females in 3rd class as it shows multiple nodes branching off for different ranges of Fare. 
+
+
+#### Exercise 5
+
+```{r}
+test_logit <- predict(mod_1, newdata = test_set, type = 'response')
+test_tree <- predict(tree_mod, newdata = test_set)[,2]
+
+```
+
+```{r}
+library(ROCR)
+
+# create the prediction objects for both models
+pred_logit <- prediction(predictions = test_logit, labels = test_set$Survived)
+pred_tree <- prediction(predictions = test_tree, labels = test_set$Survived)
+
+# get the FPR and TPR for the logistic model
+# recall that the ROC curve plots the FPR on the x-axis
+perf_logit <- performance(pred_logit, measure = 'tpr', x.measure = 'fpr')
+perf_logit_tbl <- tibble(perf_logit@x.values[[1]], perf_logit@y.values[[1]])
+
+# Change the names of the columns of the tibble
+names(perf_logit_tbl) <- c('fpr', 'tpr')
+
+# get the FPR and TPR for the tree model
+perf_tree <- performance(pred_tree, measure = 'tpr', x.measure = 'fpr')
+perf_tree_tbl <- tibble(perf_tree@x.values[[1]], perf_tree@y.values[[1]])
+
+# Change the names of the columns of the tibble
+names(perf_tree_tbl) <- c('fpr', 'tpr')
+
+# Plotting function for plotting a nice ROC curve using ggplot
+plot_roc <- function(perf_tbl) {
+p <- ggplot(data = perf_tbl, aes(x = fpr, y = tpr)) +
+geom_line(color = 'blue') +
+geom_abline(intercept = 0, slope = 1, lty = 3) +
+labs(x = 'False positive rate', y = 'True positive rate') +
+theme_bw()
+return(p)
+}
+
+# Create the ROC curves using the function we created above
+plot_roc(perf_logit_tbl)
+plot_roc(perf_tree_tbl)
+
+# calculate the AUC
+auc_logit <- performance(prediction.obj = pred_logit, measure = 'auc')
+auc_tree <- performance(prediction.obj = pred_tree, measure = 'auc')
+
+# extract the AUC value
+auc_logit@y.values[[1]]
+auc_tree@y.values[[1]]
+
+
+```
+
+
+What do you notice about the ROC curves and the AUC values? Are the models performing well? Is the
+logistic regression model doing better, worse, or about the same as the classification tree?
+
+
+The ROC curve for the logistic model is less smooth than the tree model. The AUC value for the logistic model is higher than the AUC for the tree model. The models could certainly improve in performance by approaching values closer to 1, but at 0.81 and 0.77 are performing modestly.
+
+
+Append the predicted probability values from each model (you created these at the beginning of Exercise 5 to your test_set tibble using mutate(). 
+
+new_logit <- test_logit %>% mutate(preds_prob = test_logit[,2]) %>% mutate(preds_cat = case_when(preds_prob < 0.25 ~ 'no',
+                                                                                                preds_prob>= 0.25 ~ 'yes'))
+
+new_tree <- test_tree %>% mutate(preds_prob = test_tree) %>% mutate(preds_cat = case_when(preds_prob < 0.25 ~ 'no',
+                                                                                                preds_prob>= 0.25 ~ 'yes'))
+
+
+
