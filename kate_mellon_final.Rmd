@@ -1,0 +1,16 @@
+---
+title: "COMPSCIX 415.2 Homework 9/Final"
+author: "Kate Mellon"
+date: "3/27/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(modelr)
+library(randomForest)
+```
+
+#### Bootstrapping
