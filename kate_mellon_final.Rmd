@@ -2,15 +2,76 @@
 title: "COMPSCIX 415.2 Homework 9/Final"
 author: "Kate Mellon"
 date: "3/27/2018"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
 ---
 
-```{r setup, include=FALSE}
+#### Bootstrapping
+```{r load_packages, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 
 library(modelr)
 library(randomForest)
+library(tidyverse)
+train <- read.csv("/users/katie/downloads/trainhw8.csv")
+
+train$Survived <- factor(case_when(train$Survived == 0 ~ 'no', train$Survived == 1 ~ 'yes'))
+
+glimpse(train)
+
 ```
 
-#### Bootstrapping
+
+```{r}
+library(tidyverse)
+library(modelr)
+titanic_boot <- bootstrap(data = train, n = 100)
+
+```
+
+
+```{r}
+# since the strap column of titanic_boot is a list, we can
+# extract the resampled data using the double brackets [[]],
+# and just pick out a few of them to compare the number of
+# distinct rows
+
+as.tibble(titanic_boot$strap[[1]]) %>% n_distinct()
+as.tibble(titanic_boot$strap[[2]]) %>% n_distinct()
+as.tibble(titanic_boot$strap[[3]]) %>% n_distinct()
+
+```
+
+
+```{r}
+age_mean <- function(titanic_boot) {
+data <- as.tibble(titanic_boot) # convert input data set to a tibble
+mean_age <- mean(data$Age, na.rm = TRUE) # take the mean of Age, remove NAs
+return(mean_age) # return the mean value of Age from data
+}
+# loop through the 100 bootstrap samples and use the age_mean()
+# function
+all_means <- rep(NA, 100)
+
+# start the loop
+for(i in 1:100) {
+all_means[i] <- age_mean(titanic_boot$strap[[i]])
+}
+# take a look at some of the means you calculated from your samples
+head(all_means)
+# convert to a tibble so we can use if for plotting
+all_means <- tibble(all_means = all_means)
+```
+
+
+```{r}
+ggplot(all_means, mapping=aes(all_means)) +
+  geom_histogram(binwidth = 0.5) +
+  xlab("Mean Age") +
+  ylab("Count of Mean Age")
+```
+
+
+#### Random Forests
