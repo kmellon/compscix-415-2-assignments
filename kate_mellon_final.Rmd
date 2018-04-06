@@ -9,6 +9,9 @@ output:
 ---
 
 #### Bootstrapping
+
+1.)
+
 ```{r load_packages, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -23,6 +26,7 @@ glimpse(train)
 
 ```
 
+2.)
 
 ```{r}
 library(tidyverse)
@@ -31,6 +35,8 @@ titanic_boot <- bootstrap(data = train, n = 100)
 
 ```
 
+
+3.)
 
 ```{r}
 # since the strap column of titanic_boot is a list, we can
@@ -45,7 +51,10 @@ as.tibble(titanic_boot$strap[[3]]) %>% n_distinct()
 ```
 
 
+4.)
+
 ```{r}
+
 library(tidyverse)
 
 age_mean <- function(titanic_boot) {
@@ -66,25 +75,28 @@ head(all_means)
 # convert to a tibble so we can use if for plotting
 all_means <- tibble(all_means = all_means)
 
-empirical_se <- all_means %>% summarize(se_age = sd(all_means))
-
 ```
 
 
+5.)
+
 ```{r}
 ggplot(all_means, mapping=aes(all_means)) +
-  geom_histogram(binwidth = 0.5) +
+  geom_histogram(binwidth = .5) +
   xlab("Mean Age") +
   ylab("Count of Mean Age")
 ```
 
 
+6.)
+
 ```{r}
-all_means %>% summarize(se_age = sd(all_means))
+(empirical_se <- all_means %>% summarize(se_age = sd(all_means)))
 
-
-
+(theoretical_se <- sd(train$Age, na.rm = TRUE)/sqrt(100))
 ```
+
+The empirical standard error of 0.54 using the bootstrapping method is lower than the theoretical standard error of 1.45.
 
 
 #### Random Forests
@@ -156,17 +168,26 @@ names(perf_tree_tbl) <- c('fpr', 'tpr')
 
 # Plotting function for plotting a nice ROC curve using ggplot
 
-plot_roc <- function(tbl) {
-p <- ggplot(data = tbl, aes(x = fpr, y = tpr)) +
+plot_roc <- function(tbl1,tbl2) {
+rf_tree <- bind_rows(tbl1, tbl2)
+p <- ggplot(data = rf_tree, aes(x = fpr, y = tpr)) +
 geom_line(color = 'blue') +
 geom_abline(intercept = 0, slope = 1, lty = 3) +
 labs(x = 'False positive rate', y = 'True positive rate') +
 theme_bw()
 return(p)
+legend("right", legend = c("Decision_Tree", "Random_Forest"), col = c('red','blue')) 
 }
 
-plot_roc(perf_rf_tbl)
-plot_roc(perf_tree_tbl)
+plot_roc(perf_tree_tbl, perf_rf_tbl)
+
+# calculate the AUC
+auc_rf <- performance(prediction.obj = pred_rf, measure = 'auc')
+auc_tree <- performance(prediction.obj = pred_tree, measure = 'auc')
+
+# extract the AUC value
+auc_rf@y.values[[1]]
+auc_tree@y.values[[1]]
 
 ```
 
@@ -174,7 +195,7 @@ plot_roc(perf_tree_tbl)
 
 Which model performs better: decision tree or random forest?
 
-The random forest model performs better as it appears to have a higher auc on the ROC plot than the decision tree model.
+The random forest model performs better as it has a higher auc than the decision tree model, and the ROC curves illustrate that a rising true positive rate has a higher false positive rate on the decision tree compared to the random forest. 
 
 What is the approximate false positive rate, for both the decision tree and the random forest, if we attain a true positive rate of approximately 0.75? Answers do not need to be exact - just ballpark it by looking at the plots.
 
